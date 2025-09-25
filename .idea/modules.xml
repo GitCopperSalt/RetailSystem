@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/RetailSys/RetailSys.iml" filepath="$PROJECT_DIR$/RetailSys/RetailSys.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/RetailSystem.iml" filepath="$PROJECT_DIR$/.idea/RetailSystem.iml" />
     </modules>
   </component>
