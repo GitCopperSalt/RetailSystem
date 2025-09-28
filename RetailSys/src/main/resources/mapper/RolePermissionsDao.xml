@@ -38,6 +38,27 @@ id, role_id, permission_id, created_at
         </where>
         limit #{pageable.offset}, #{pageable.pageSize}
     </select>
+    
+    <!--查询所有数据，不进行分页-->
+    <select id="queryAll" resultMap="RolePermissionsMap">
+        select
+id, role_id, permission_id, created_at
+        from role_permissions
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="roleId != null">
+                and role_id = #{roleId}
+            </if>
+            <if test="permissionId != null">
+                and permission_id = #{permissionId}
+            </if>
+            <if test="createdAt != null">
+                and created_at = #{createdAt}
+            </if>
+        </where>
+    </select>
 
     <!--统计总行数-->
     <select id="count" resultType="java.lang.Long">

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -12,10 +13,46 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { login, wechatLogin } = useAuth();
 
+  // 组件挂载时检查是否已登录
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        if (token) {
+          // 验证token是否有效（可以通过调用一个需要认证的简单接口）
+          try {
+            const response = await axios.get('/api/auth/me', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            // 如果token有效，根据用户角色跳转到对应的页面
+            if (response.data && response.data.role) {
+              const role = response.data.role.toLowerCase();
+              if (role === 'admin' || role === 'store_manager') {
+                navigate('/admin/dashboard');
+              } else {
+                navigate('/user/products');
+              }
+            }
+          } catch (err) {
+            // Token无效或过期，继续显示登录页面
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userInfo');
+          }
+        }
+      } catch (error) {
+        console.error('检查登录状态失败:', error);
+      }
+    };
+
+    checkLoginStatus();
+  }, [navigate]);
+
   // 处理用户账号密码登录
   const handleUserPasswordLogin = async (e) => {
     e.preventDefault();
     
+    // 表单验证
     if (!username || !password) {
       setError('请输入用户名和密码');
       return;
@@ -25,10 +62,29 @@ const LoginPage = () => {
     setError('');
     
     try {
-      await login({ username, password, type: 'user' });
-      navigate('/user/products');
+      // 调用登录方法，获取用户数据
+      const userData = await login({ username, password });
+      
+      // 根据后端返回的用户角色进行跳转
+      if (userData.role) {
+        const role = userData.role.toLowerCase();
+        if (role === 'admin' || role === 'store_manager') {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/user/products');
+        }
+      } else {
+        navigate('/user/products');
+      }
     } catch (err) {
-      setError(err.message || '登录失败，请重试');
+      // 处理不同类型的错误
+      if (err.response && err.response.status === 401) {
+        setError('用户名或密码错误，请重试');
+      } else if (err.response && err.response.status === 403) {
+        setError('该账号没有用户访问权限');
+      } else {
+        setError(err.message || '登录失败，请重试');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -38,6 +94,7 @@ const LoginPage = () => {
   const handleAdminLogin = async (e) => {
     e.preventDefault();
     
+    // 表单验证
     if (!username || !password) {
       setError('请输入用户名和密码');
       return;
@@ -47,10 +104,25 @@ const LoginPage = () => {
     setError('');
     
     try {
-      await login({ username, password, type: 'admin' });
-      navigate('/admin/dashboard');
+      // 调用登录方法，获取用户数据
+      const userData = await login({ username, password });
+      
+      // 根据后端返回的用户角色进行跳转
+      if (userData.role && (userData.role.toLowerCase() === 'admin' || userData.role.toLowerCase() === 'store_manager')) {
+        navigate('/admin/dashboard');
+      } else {
+        // 如果不是管理员角色，则显示错误信息
+        setError('该账号没有管理权限');
+      }
     } catch (err) {
-      setError(err.message || '登录失败，请重试');
+      // 处理不同类型的错误
+      if (err.response && err.response.status === 401) {
+        setError('用户名或密码错误，请重试');
+      } else if (err.response && err.response.status === 403) {
+        setError('该账号没有管理权限');
+      } else {
+        setError(err.message || '登录失败，请重试');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -62,15 +134,29 @@ const LoginPage = () => {
     setError('');
     
     try {
-      // 这里应该集成微信API
-      // 为了演示目的，使用模拟的openid
-      await wechatLogin('user123');
+      // 在实际应用中，这里应该调用微信官方API获取授权码
+      // 然后使用该授权码调用后端的微信登录接口
+      // 为了演示目的，我们使用模拟的code
+      const mockCode = 'mock_wechat_code_' + Date.now();
+      
+      // 调用微信登录方法
+      const userData = await wechatLogin(mockCode);
+      
+      // 登录成功后跳转到用户首页
       navigate('/user/products');
     } catch (err) {
-      setError('微信登录失败，请重试');
+      // 处理微信登录错误
+      setError(err.message || '微信登录失败，请重试');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // 处理忘记密码
+  const handleForgotPassword = (e) => {
+    e.preventDefault();
+    // 实现忘记密码逻辑
+    navigate('/forgot-password');
   };
 
   return (

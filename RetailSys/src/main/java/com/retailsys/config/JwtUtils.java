@@ -32,7 +32,8 @@ public class JwtUtils {
     }
 
     /**
-     * 从JWT令牌中提取过期时间     */
+     * 从JWT令牌中提取过期时间
+     */
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
@@ -46,7 +47,8 @@ public class JwtUtils {
     }
 
     /**
-     * 从JWT令牌中提取所有声明     */
+     * 从JWT令牌中提取所有声明
+     */
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder().setSigningKey(io.jsonwebtoken.security.Keys.hmacShaKeyFor(jwtSecret.getBytes())).build().parseClaimsJws(token).getBody();
     }
@@ -59,10 +61,18 @@ public class JwtUtils {
     }
 
     /**
-     * 生成JWT令牌
+     * 生成JWT令牌（默认声明）
      */
     public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
+        return createToken(claims, username);
+    }
+
+    /**
+     * 基于自定义声明生成JWT令牌
+     */
+    public String generateTokenWithClaims(String username, Map<String, Object> additionalClaims) {
+        Map<String, Object> claims = new HashMap<>(additionalClaims);
         return createToken(claims, username);
     }
 
@@ -85,5 +95,17 @@ public class JwtUtils {
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    /**
+     * 仅验证令牌是否有效（不检查用户信息）
+     */
+    public Boolean isTokenValid(String token) {
+        try {
+            extractAllClaims(token);
+            return !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

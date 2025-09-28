@@ -42,6 +42,30 @@ id, role_name, description, created_at, updated_at
         </where>
         limit #{pageable.offset}, #{pageable.pageSize}
     </select>
+    
+    <!--查询所有数据，不进行分页-->
+    <select id="queryAll" resultMap="RolesMap">
+        select
+id, role_name, description, created_at, updated_at
+        from roles
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="roleName != null and roleName != ''">
+                and role_name = #{roleName}
+            </if>
+            <if test="description != null and description != ''">
+                and description = #{description}
+            </if>
+            <if test="createdAt != null">
+                and created_at = #{createdAt}
+            </if>
+            <if test="updatedAt != null">
+                and updated_at = #{updatedAt}
+            </if>
+        </where>
+    </select>
 
     <!--统计总行数-->
     <select id="count" resultType="java.lang.Long">

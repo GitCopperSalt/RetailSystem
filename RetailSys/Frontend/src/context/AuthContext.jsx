@@ -13,6 +13,14 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState(null); // Added for backward compatibility with App.jsx
 
+  // 处理token错误的通用方法
+  const handleTokenError = () => {
+    setCurrentUser(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userInfo');
+  };
+
   // Check if user is authenticated on app load
   useEffect(() => {
     const checkAuth = async () => {
@@ -21,7 +29,7 @@ export const AuthProvider = ({ children }) => {
         if (token) {
           // 设置认证状态
           setIsAuthenticated(true);
-          
+           
           try {
             // 尝试从localStorage获取保存的用户信息
             const savedUserInfo = localStorage.getItem('userInfo');
@@ -30,15 +38,20 @@ export const AuthProvider = ({ children }) => {
               setCurrentUser(parsedUserInfo);
               setUserInfo(parsedUserInfo);
             } else {
-              // 模拟用户信息作为后备
-              setCurrentUser({ username: 'authenticated', role: 'user', permissions: [] });
-              setUserInfo({ username: 'authenticated', role: 'user', permissions: [] });
+              // 从后端获取用户信息
+              try {
+                const userInfo = await authApi.getCurrentUser();
+                setCurrentUser(userInfo);
+                setUserInfo(userInfo);
+                localStorage.setItem('userInfo', JSON.stringify(userInfo));
+              } catch (error) {
+                console.error('获取用户信息失败:', error);
+                handleTokenError();
+              }
             }
           } catch (userInfoError) {
             console.error('Error parsing saved user info:', userInfoError);
-            // 模拟用户信息作为后备
-            setCurrentUser({ username: 'authenticated', role: 'user', permissions: [] });
-            setUserInfo({ username: 'authenticated', role: 'user', permissions: [] });
+            handleTokenError();
           }
         }
       } catch (error) {
@@ -55,10 +68,10 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       // 解构凭证参数
-      const { username, password, type = 'admin' } = credentials;
+      const { username, password } = credentials;
       
       // 调用实际的登录API，传递凭证对象
-      const response = await authApi.login({ username, password, type });
+      const response = await authApi.login({ username, password });
       
       if (response.token) {
         // 存储token
@@ -66,13 +79,15 @@ export const AuthProvider = ({ children }) => {
         
         // 设置认证状态
         setIsAuthenticated(true);
-        // 保存用户类型、角色和权限信息
-        // 后端应返回用户的角色和权限列表，这里假设response包含role和permissions字段
+        // 保存用户角色和权限信息
+        // 严格按照数据库表结构设计，保存用户的完整信息，包括角色和权限
         const userData = {
+          id: response.userId,
           username,
-          role: response.role || type,
+          role: response.role,
           permissions: response.permissions || [],
-          type
+          // 保留原始响应中的其他信息
+          ...response
         };
         setCurrentUser(userData);
         setUserInfo(userData);
@@ -83,11 +98,13 @@ export const AuthProvider = ({ children }) => {
         // 获取并更新系统角色权限映射
         await fetchAndUpdateSystemRolePermissions();
         
+        // 返回完整的用户认证信息，包括token、角色和权限
         return {
           username,
           token: response.token,
-          role: response.role || type,
-          permissions: response.permissions || []
+          role: response.role,
+          permissions: response.permissions || [],
+          userId: response.userId
         };
       } else {
         throw new Error('登录失败，未返回token');
@@ -143,98 +160,73 @@ export const AuthProvider = ({ children }) => {
   // Check if user has permission
   const hasPermission = (permission) => {
     if (!isAuthenticated || !currentUser) return false;
-    if (currentUser.role === 'admin') return true; // Admin has all permissions
+    // 忽略大小写检查管理员角色
+    if (currentUser.role && currentUser.role.toLowerCase() === 'admin') return true; // Admin has all permissions
+    // 确保permissions是数组类型
+    const userPermissions = Array.isArray(currentUser.permissions) ? currentUser.permissions : [];
     // 检查用户是否直接拥有该权限
-    if (currentUser.permissions && currentUser.permissions.includes(permission)) return true;
-    // 以下是适配数据库模型的额外逻辑，在前端作为后备检查
-    // 获取系统角色权限映射（从localStorage或API获取）
-    const systemRolePermissions = getSystemRolePermissions();
-    // 检查用户角色是否拥有该权限
-    if (systemRolePermissions[currentUser.role] && systemRolePermissions[currentUser.role].includes(permission)) {
-      return true;
-    }
-    return false;
+    return userPermissions.includes(permission);
   };
 
   // 获取系统角色权限映射
+  // 根据数据库表结构设计，admin角色可以管理所有角色的权限
   const getSystemRolePermissions = () => {
-    try {
-      // 从localStorage获取保存的系统角色权限映射
-      const savedRolePermissions = localStorage.getItem('systemRolePermissions');
-      if (savedRolePermissions) {
-        return JSON.parse(savedRolePermissions);
+    // 从localStorage获取用户信息
+    const savedUserInfo = localStorage.getItem('userInfo');
+    if (savedUserInfo) {
+      try {
+        const userInfo = JSON.parse(savedUserInfo);
+        // admin角色拥有最高权限，可以管理所有角色的权限
+        if (userInfo.role && userInfo.role.toLowerCase() === 'admin') {
+          return {
+            admin: ['manage_users', 'manage_products', 'manage_orders', 'manage_categories', 'view_dashboard', 'manage_inventory', 'process_payments'],
+            store_manager: ['manage_products', 'manage_orders', 'manage_categories', 'view_dashboard'],
+            inventory_manager: ['manage_products', 'manage_inventory'],
+            cashier: ['manage_orders', 'process_payments'],
+            customer: []
+          };
+        }
+        // 非admin角色只能查看自己的权限
+        return { [userInfo.role]: userInfo.permissions || [] };
+      } catch (error) {
+        console.error('Error parsing user info:', error);
       }
-    } catch (error) {
-      console.error('Error parsing system role permissions:', error);
     }
-    // 返回默认的角色权限映射
-    return {
-      admin: ['manage_users', 'manage_products', 'manage_orders', 'view_reports'],
-      store_manager: ['manage_products', 'manage_orders', 'view_reports'],
-      user: ['view_products', 'create_orders']
-    };
+    return {};
   };
 
-  // 从后端获取并更新系统角色权限映射
+  // 更新系统角色权限映射
   const fetchAndUpdateSystemRolePermissions = async () => {
     try {
-      // 首先获取所有角色
-      const rolesResponse = await rolesApi.getRoles();
-      // 然后获取所有角色权限关联
-      const rolePermissionsResponse = await rolePermissionsApi.getRolePermissions();
-      
-      // 确保处理正确的数据格式
-      const roles = rolesResponse?.data || rolesResponse || [];
-      const rolePermissions = rolePermissionsResponse?.data || rolePermissionsResponse || [];
-      
-      // 构建角色权限映射
-      const rolePermissionMap = {};
-      
-      // 初始化每个角色的权限数组
-      if (Array.isArray(roles)) {
-        roles.forEach(role => {
-          rolePermissionMap[role.name] = [];
-        });
-      } else {
-        console.warn('Roles data is not an array, using empty array instead');
+      // 从localStorage获取用户信息
+      const savedUserInfo = localStorage.getItem('userInfo');
+      if (savedUserInfo) {
+        const userInfo = JSON.parse(savedUserInfo);
+        // 确保权限是数组类型
+        if (!Array.isArray(userInfo.permissions)) {
+          userInfo.permissions = [];
+        }
+        
+        // 按照数据库表结构设计，返回角色权限映射
+        // admin角色可以管理所有角色的权限
+        const rolePermissionsMap = {};
+        if (userInfo.role && userInfo.role.toLowerCase() === 'admin') {
+          rolePermissionsMap.admin = ['manage_users', 'manage_products', 'manage_orders', 'manage_categories', 'view_dashboard', 'manage_inventory', 'process_payments'];
+          rolePermissionsMap.store_manager = ['manage_products', 'manage_orders', 'manage_categories', 'view_dashboard'];
+          rolePermissionsMap.inventory_manager = ['manage_products', 'manage_inventory'];
+          rolePermissionsMap.cashier = ['manage_orders', 'process_payments'];
+          rolePermissionsMap.customer = [];
+        } else {
+          // 非admin角色只能查看自己的权限
+          rolePermissionsMap[userInfo.role] = userInfo.permissions || [];
+        }
+        
+        return rolePermissionsMap;
       }
-      
-      // 根据角色权限关联添加权限
-      if (Array.isArray(rolePermissions)) {
-        rolePermissions.forEach(rolePermission => {
-          // 假设rolePermission对象包含roleName和permissionName字段
-          // 如果后端返回的字段名不同，需要根据实际情况调整
-          const roleName = rolePermission.roleName || rolePermission.role?.name;
-          const permissionName = rolePermission.permissionName || rolePermission.permission?.name;
-          
-          if (roleName && permissionName && rolePermissionMap[roleName]) {
-            rolePermissionMap[roleName].push(permissionName);
-          }
-        });
-      } else {
-        console.warn('Role permissions data is not an array, using empty array instead');
-      }
-      
-      // 保存到localStorage
-      localStorage.setItem('systemRolePermissions', JSON.stringify(rolePermissionMap));
-      
-      // 刷新当前用户的权限信息
-      if (currentUser && currentUser.role && rolePermissionMap[currentUser.role]) {
-        const updatedUser = {
-          ...currentUser,
-          permissions: [...new Set([...(currentUser.permissions || []), ...rolePermissionMap[currentUser.role]])]
-        };
-        setCurrentUser(updatedUser);
-        setUserInfo(updatedUser);
-        localStorage.setItem('userInfo', JSON.stringify(updatedUser));
-      }
-      
-      return rolePermissionMap;
     } catch (error) {
-      console.error('Error fetching system role permissions:', error);
-      // 如果获取失败，返回现有的角色权限映射
-      return getSystemRolePermissions();
+      console.error('Error updating system role permissions:', error);
     }
+    return {};
   };
 
   // Check if user has specific role
@@ -246,6 +238,22 @@ export const AuthProvider = ({ children }) => {
   // Added for backward compatibility with App.jsx
   const isLoggedIn = isAuthenticated;
   
+  // 刷新token
+  const refreshToken = async () => {
+    try {
+      const response = await authApi.refreshToken();
+      if (response.token) {
+        localStorage.setItem('authToken', response.token);
+        return response;
+      }
+    } catch (error) {
+      console.error('刷新token失败:', error);
+      handleTokenError();
+      navigate('/login');
+      throw error;
+    }
+  };
+
   const value = {
     currentUser,
     userInfo, // For backward compatibility
@@ -257,7 +265,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     hasPermission,
     hasRole,
-    fetchAndUpdateSystemRolePermissions
+    fetchAndUpdateSystemRolePermissions,
+    refreshToken
   };
 
   return (
