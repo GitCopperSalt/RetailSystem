@@ -89,7 +89,7 @@ export const messagesApi = {
   // 删除消息
   deleteMessage: async (id) => {
     try {
-      const response = await api.delete('/messages', { params: { id } });
+      const response = await api.delete(`/messages/${id}`);
       return response.data;
     } catch (error) {
       console.error('删除消息失败:', error);

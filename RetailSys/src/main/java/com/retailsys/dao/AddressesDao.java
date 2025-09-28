@@ -22,7 +22,7 @@ public interface AddressesDao {
     Addresses queryById(Integer id);
 
     /**
-     * 查询指定行数�?
+     * 查询指定行数
      *
      * @param addresses 查询条件
      * @param pageable         分页对象
@@ -31,10 +31,10 @@ public interface AddressesDao {
     List<Addresses> queryAllByLimit(Addresses addresses, @Param("page") Page<Addresses> page);
 
     /**
-     * 统计总行�?
+     * 统计总行数
      *
      * @param addresses 查询条件
-     * @return 总行�?
+     * @return 总行数
      */
     long count(Addresses addresses);
 
@@ -47,7 +47,7 @@ public interface AddressesDao {
     int insert(Addresses addresses);
 
     /**
-     * 批量新增数据（MyBatis原生foreach方法�?
+     * 批量新增数据（MyBatis原生foreach方法）
      *
      * @param entities List<Addresses> 实例对象列表
      * @return 影响行数
@@ -55,11 +55,11 @@ public interface AddressesDao {
     int insertBatch(@Param("entities") List<Addresses> entities);
 
     /**
-     * 批量新增或按主键更新数据（MyBatis原生foreach方法�?
+     * 批量新增或按主键更新数据（MyBatis原生foreach方法）
      *
      * @param entities List<Addresses> 实例对象列表
      * @return 影响行数
-     * @throws org.springframework.jdbc.BadSqlGrammarException 入参是空List的时候会抛SQL语句错误的异常，请自行校验入�?
+     * @throws org.springframework.jdbc.BadSqlGrammarException 入参是空List的时候会抛SQL语句错误的异常，请自行校验入参
      */
     int insertOrUpdateBatch(@Param("entities") List<Addresses> entities);
 

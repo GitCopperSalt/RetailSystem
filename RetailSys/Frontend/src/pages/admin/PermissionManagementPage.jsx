@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { usersApi } from '../../apis/usersApi';
 
 const PermissionManagementPage = () => {
   const navigate = useNavigate();
@@ -59,9 +60,6 @@ const PermissionManagementPage = () => {
     const loadData = async () => {
       setLoading(true);
       try {
-        // 从API获取用户数据（这里使用模拟数据，因为apiService.js中没有明确的用户管理API）
-        // 在实际项目中，应该调用真实的API
-        
         // 模拟API调用延迟
         await new Promise(resolve => setTimeout(resolve, 800));
         
@@ -106,45 +104,9 @@ const PermissionManagementPage = () => {
           }
         ];
         
-        // 准备模拟的用户数据
-        const systemUsers = [
-          {
-            id: 'admin',
-            username: 'admin',
-            email: 'admin@example.com',
-            role: 'admin',
-            isActive: true,
-            lastLogin: new Date().toISOString(),
-            createdAt: new Date().toISOString()
-          },
-          {
-            id: 'manager1',
-            username: 'manager1',
-            email: 'manager1@example.com',
-            role: 'store_manager',
-            isActive: true,
-            lastLogin: new Date(Date.now() - 86400000).toISOString(),
-            createdAt: new Date(Date.now() - 7 * 86400000).toISOString()
-          },
-          {
-            id: 'inventory1',
-            username: 'inventory1',
-            email: 'inventory1@example.com',
-            role: 'inventory_clerk',
-            isActive: true,
-            lastLogin: new Date(Date.now() - 2 * 86400000).toISOString(),
-            createdAt: new Date(Date.now() - 14 * 86400000).toISOString()
-          },
-          {
-            id: 'cashier1',
-            username: 'cashier1',
-            email: 'cashier1@example.com',
-            role: 'cashier',
-            isActive: true,
-            lastLogin: new Date(Date.now() - 4 * 86400000).toISOString(),
-            createdAt: new Date(Date.now() - 30 * 86400000).toISOString()
-          }
-        ];
+        // 从API获取用户数据
+        const usersResponse = await usersApi.getUsers();
+        const systemUsers = usersResponse.data || [];
         
         setRoles(systemRoles);
         setUsers(systemUsers);
@@ -157,7 +119,7 @@ const PermissionManagementPage = () => {
     };
 
     loadData();
-  }, [isAuthenticated, hasPermission, navigate]);
+  }, [isAuthenticated, hasPermission, navigate, availablePermissions]);
 
   // Handle role form input change
   const handleRoleInputChange = (e) => {
@@ -343,50 +305,61 @@ const PermissionManagementPage = () => {
   };
 
   // Handle add user
-  const handleAddUser = () => {
+  const handleAddUser = async () => {
     if (validateUserForm()) {
-      const newUser = {
-        id: `user_${Date.now()}`,
-        ...userFormData,
-        password: userFormData.password, // In a real app, this would be hashed
-        createdAt: new Date().toISOString(),
-        lastLogin: null
-      };
-      
-      const updatedUsers = [...users, newUser];
-      setUsers(updatedUsers);
-      localStorage.setItem('systemUsers', JSON.stringify(updatedUsers));
-      
-      // Reset form and close modal
-      resetUserForm();
+      try {
+        const userData = {
+          ...userFormData,
+          password: userFormData.password // 密码将在后端进行哈希处理
+        };
+        
+        // 调用API创建用户
+        const response = await usersApi.createUser(userData);
+        
+        // 更新本地用户列表
+        setUsers([...users, response.data]);
+        
+        // Reset form and close modal
+        resetUserForm();
+      } catch (error) {
+        console.error('添加用户失败:', error);
+        // 在实际项目中，应该显示错误消息给用户
+      }
     }
   };
 
   // Handle edit user
-  const handleEditUser = () => {
+  const handleEditUser = async () => {
     if (validateUserForm() && editingUser) {
-      // Don't update password if not provided
-      const userDataToUpdate = {
-        ...userFormData
-      };
-      if (!userDataToUpdate.password) {
-        delete userDataToUpdate.password;
+      try {
+        // Don't update password if not provided
+        const userDataToUpdate = {
+          ...userFormData
+        };
+        if (!userDataToUpdate.password) {
+          delete userDataToUpdate.password;
+        }
+        
+        // 调用API更新用户
+        const response = await usersApi.updateUser(editingUser.id, userDataToUpdate);
+        
+        // 更新本地用户列表
+        const updatedUsers = users.map(user => 
+          user.id === editingUser.id ? response.data : user
+        );
+        setUsers(updatedUsers);
+        
+        // Reset form and close modal
+        resetUserForm();
+      } catch (error) {
+        console.error('更新用户失败:', error);
+        // 在实际项目中，应该显示错误消息给用户
       }
-      
-      const updatedUsers = users.map(user => 
-        user.id === editingUser.id ? { ...user, ...userDataToUpdate } : user
-      );
-      
-      setUsers(updatedUsers);
-      localStorage.setItem('systemUsers', JSON.stringify(updatedUsers));
-      
-      // Reset form and close modal
-      resetUserForm();
     }
   };
 
   // Handle delete user
-  const handleDeleteUser = (userId) => {
+  const handleDeleteUser = async (userId) => {
     // Prevent deleting the currently logged-in user
     if (currentUser?.id === userId) {
       alert('您不能删除当前登录的用户。');
@@ -394,25 +367,47 @@ const PermissionManagementPage = () => {
       return;
     }
     
-    const updatedUsers = users.filter(user => user.id !== userId);
-    setUsers(updatedUsers);
-    localStorage.setItem('systemUsers', JSON.stringify(updatedUsers));
-    setShowDeleteConfirm(null);
+    try {
+      // 调用API删除用户
+      await usersApi.deleteUser(userId);
+      
+      // 更新本地用户列表
+      const updatedUsers = users.filter(user => user.id !== userId);
+      setUsers(updatedUsers);
+      setShowDeleteConfirm(null);
+    } catch (error) {
+      console.error('删除用户失败:', error);
+      // 在实际项目中，应该显示错误消息给用户
+    }
   };
 
   // Handle toggle user active status
-  const handleToggleUserStatus = (userId) => {
+  const handleToggleUserStatus = async (userId) => {
     // Prevent deactivating the currently logged-in user
     if (currentUser?.id === userId) {
       alert('您不能停用当前登录的用户。');
       return;
     }
     
-    const updatedUsers = users.map(user => 
-      user.id === userId ? { ...user, isActive: !user.isActive } : user
-    );
-    setUsers(updatedUsers);
-    localStorage.setItem('systemUsers', JSON.stringify(updatedUsers));
+    try {
+      // 找到要更新的用户
+      const userToUpdate = users.find(user => user.id === userId);
+      if (userToUpdate) {
+        // 调用API更新用户状态
+        const response = await usersApi.updateUser(userId, {
+          isActive: !userToUpdate.isActive
+        });
+        
+        // 更新本地用户列表
+        const updatedUsers = users.map(user => 
+          user.id === userId ? response.data : user
+        );
+        setUsers(updatedUsers);
+      }
+    } catch (error) {
+      console.error('更新用户状态失败:', error);
+      // 在实际项目中，应该显示错误消息给用户
+    }
   };
 
   // Reset role form and modal states

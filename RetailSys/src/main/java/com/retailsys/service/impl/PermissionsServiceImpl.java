@@ -34,7 +34,7 @@ public class PermissionsServiceImpl implements PermissionsService {
     /**
      * 分页查询
      *
-     * @param permissions 筛选条�?
+     * @param permissions 筛选条件
      * @return 查询结果
      */
     @Override

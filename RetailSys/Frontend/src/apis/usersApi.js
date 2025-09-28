@@ -64,6 +64,17 @@ export const usersApi = {
     }
   },
 
+  // 获取当前登录用户信息
+  getCurrentUser: async () => {
+    try {
+      const response = await api.get('/auth/me');
+      return response.data;
+    } catch (error) {
+      console.error('获取当前用户信息失败:', error);
+      throw error;
+    }
+  },
+
   // 创建新用户
   createUser: async (userData) => {
     try {
@@ -86,10 +97,21 @@ export const usersApi = {
     }
   },
 
+  // 更新用户角色
+  updateUserRole: async (userId, roleId) => {
+    try {
+      const response = await api.put(`/users/${userId}/role`, { roleId });
+      return response.data;
+    } catch (error) {
+      console.error('更新用户角色失败:', error);
+      throw error;
+    }
+  },
+
   // 删除用户
   deleteUser: async (id) => {
     try {
-      const response = await api.delete('/users', { params: { id } });
+      const response = await api.delete(`/users/${id}`);
       return response.data;
     } catch (error) {
       console.error('删除用户失败:', error);

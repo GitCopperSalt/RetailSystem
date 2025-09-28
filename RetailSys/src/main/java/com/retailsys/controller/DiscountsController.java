@@ -24,9 +24,9 @@ public class DiscountsController {
     private DiscountsService discountsService;
 
     /**
-     * 查询所有数�?
+     * 查询所有数据
      *
-     * @param discounts 筛选条�?
+     * @param discounts 筛选条件
      * @return 查询结果
      */
     @GetMapping
@@ -57,10 +57,10 @@ public class DiscountsController {
     }
 
     /**
-     * 编辑数据
+     * 修改数据
      *
      * @param discounts 实体
-     * @return 编辑结果
+     * @return 修改结果
      */
     @PutMapping
     public ResponseEntity<Discounts> edit(Discounts discounts) {
@@ -73,8 +73,8 @@ public class DiscountsController {
      * @param id 主键
      * @return 删除是否成功
      */
-    @DeleteMapping
-    public ResponseEntity<Boolean> deleteById(Integer id) {
+    @DeleteMapping("{id}")
+    public ResponseEntity<Boolean> deleteById(@PathVariable("id") Integer id) {
         return ResponseEntity.ok(this.discountsService.deleteById(id));
     }
 

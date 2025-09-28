@@ -89,7 +89,7 @@ export const discountsApi = {
   // 删除优惠
   deleteDiscount: async (id) => {
     try {
-      const response = await api.delete('/discounts', { params: { id } });
+      const response = await api.delete(`/discounts/${id}`);
       return response.data;
     } catch (error) {
       console.error('删除优惠失败:', error);

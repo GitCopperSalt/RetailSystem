@@ -4,7 +4,7 @@ import java.util.Date;
 import java.io.Serializable;
 
 /**
- * (Categories)实体�?
+ * (Categories)实体类
  *
  * @author makejava
  * @since 2025-09-23 17:57:19
@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class Categories implements Serializable {
     private static final long serialVersionUID = 861894520361047372L;
 /**
-     * 分类ID，主�?
+     * 分类ID，主键
      */
     private Integer id;
 /**

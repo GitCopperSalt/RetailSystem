@@ -15,9 +15,9 @@ import org.apache.ibatis.annotations.Param;
 public interface UsersDao extends BaseMapper<Users> {
 
     /**
-     * 通过用户名查询用�?
+     * 通过用户名查询用户
      *
-     * @param username 用户�?
+     * @param username 用户名
      * @return 用户对象
      */
     Users queryByUsername(@Param("username") String username);

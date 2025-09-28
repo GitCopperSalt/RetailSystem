@@ -34,7 +34,7 @@ public class MessagesServiceImpl implements MessagesService {
     /**
      * 分页查询
      *
-     * @param messages 筛选条�?
+     * @param messages 筛选条件
      * @return 查询结果
      */
     @Override

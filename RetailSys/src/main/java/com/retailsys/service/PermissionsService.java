@@ -4,7 +4,7 @@ import com.retailsys.entity.Permissions;
 import java.util.List;
 
 /**
- * (Permissions)表服务接�?
+ * (Permissions)表服务接�?
  *
  * @author makejava
  * @since 2025-09-23 17:59:12
@@ -22,7 +22,7 @@ public interface PermissionsService {
     /**
      * 分页查询
      *
-     * @param permissions 筛选条�?
+     * @param permissions 筛选条件
      * @return 查询结果
      */
     List<Permissions> queryAll(Permissions permissions);

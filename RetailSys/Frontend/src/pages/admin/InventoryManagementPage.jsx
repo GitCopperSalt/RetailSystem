@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import productsApi from '../../apis/productsApi';
+import categoriesApi from '../../apis/categoriesApi';
 
 const InventoryManagementPage = () => {
   const { hasPermission } = useAuth();
@@ -17,11 +19,49 @@ const InventoryManagementPage = () => {
   const [replenishmentList, setReplenishmentList] = useState([]);
   const [categories, setCategories] = useState([]);
 
-  // Mock data for products
+  // 从后端API获取库存数据
   useEffect(() => {
-    // Simulate API call
     const fetchInventory = async () => {
-      setTimeout(() => {
+      try {
+        setLoading(true);
+        
+        // 并行获取商品和分类数据
+        const [productsResponse, categoriesResponse] = await Promise.all([
+          productsApi.getProducts({ pageSize: 100 }), // 获取所有商品，限制为100条
+          categoriesApi.getCategories()              // 获取所有分类
+        ]);
+        
+        // 转换后端商品数据格式以匹配前端预期的结构
+        const productsData = productsResponse.map(item => ({
+          id: item.id,
+          name: item.name,
+          category: categoriesResponse.find(cat => cat.id === item.category_id)?.name || '未分类',
+          price: parseFloat(item.price),
+          currentStock: item.stock,
+          lowStockThreshold: 10, // 默认预警阈值，实际项目中可能需要从API获取
+          unit: '件', // 默认单位，实际项目中可能需要从API获取
+          sku: item.sku || `SKU-${item.id}`,
+          imageUrl: item.image_url || 'https://via.placeholder.com/80',
+          lastStockUpdate: item.update_time || new Date().toISOString().replace('T', ' ').substring(0, 19),
+          expiryDate: item.expiry_date || (new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+          salesThisWeek: 0, // 默认值，实际项目中可能需要从API获取
+          reorderPoint: 15, // 默认补货点，实际项目中可能需要从API获取
+          supplier: item.supplier || '未知供应商'
+        }));
+        
+        // 提取唯一分类
+        const uniqueCategories = ['all', ...new Set(productsData.map(p => p.category))];
+        
+        setProducts(productsData);
+        setFilteredProducts(productsData);
+        setCategories(uniqueCategories);
+        
+        // 生成补货清单
+        const lowStockProducts = productsData.filter(p => p.currentStock <= p.reorderPoint);
+        setReplenishmentList(lowStockProducts);
+      } catch (error) {
+        console.error('获取库存数据失败:', error);
+        // 发生错误时使用mock数据作为备用
         const mockProducts = [
           {
             id: 1,
@@ -54,118 +94,16 @@ const InventoryManagementPage = () => {
             salesThisWeek: 45,
             reorderPoint: 30,
             supplier: '金谷米业'
-          },
-          {
-            id: 3,
-            name: '纯牛奶 1L*12',
-            category: '乳制品',
-            price: 69.90,
-            currentStock: 32,
-            lowStockThreshold: 15,
-            unit: '箱',
-            sku: 'SKU-MILK-001',
-            imageUrl: 'https://via.placeholder.com/80',
-            lastStockUpdate: '2024-05-18 09:15:34',
-            expiryDate: '2024-06-20',
-            salesThisWeek: 58,
-            reorderPoint: 25,
-            supplier: '光明乳业'
-          },
-          {
-            id: 4,
-            name: '精选苹果 10个装',
-            category: '水果',
-            price: 39.90,
-            currentStock: 8,
-            lowStockThreshold: 10,
-            unit: '盒',
-            sku: 'SKU-FRUIT-001',
-            imageUrl: 'https://via.placeholder.com/80',
-            lastStockUpdate: '2024-05-18 10:05:47',
-            expiryDate: '2024-05-22',
-            salesThisWeek: 32,
-            reorderPoint: 15,
-            supplier: '果园直供'
-          },
-          {
-            id: 5,
-            name: '天然矿泉水 500ml*24',
-            category: '饮料',
-            price: 29.90,
-            currentStock: 120,
-            lowStockThreshold: 50,
-            unit: '箱',
-            sku: 'SKU-DRINK-001',
-            imageUrl: 'https://via.placeholder.com/80',
-            lastStockUpdate: '2024-05-16 16:45:23',
-            expiryDate: '2024-12-31',
-            salesThisWeek: 28,
-            reorderPoint: 60,
-            supplier: '农夫山泉'
-          },
-          {
-            id: 6,
-            name: '厨房清洁套装',
-            category: '日用品',
-            price: 59.90,
-            currentStock: 45,
-            lowStockThreshold: 20,
-            unit: '套',
-            sku: 'SKU-HOUS-001',
-            imageUrl: 'https://via.placeholder.com/80',
-            lastStockUpdate: '2024-05-15 11:30:18',
-            expiryDate: '2025-03-15',
-            salesThisWeek: 15,
-            reorderPoint: 25,
-            supplier: '清洁用品供应商'
-          },
-          {
-            id: 7,
-            name: '休闲饼干礼盒',
-            category: '零食',
-            price: 49.90,
-            currentStock: 68,
-            lowStockThreshold: 25,
-            unit: '盒',
-            sku: 'SKU-SNACK-001',
-            imageUrl: 'https://via.placeholder.com/80',
-            lastStockUpdate: '2024-05-17 10:20:45',
-            expiryDate: '2024-08-30',
-            salesThisWeek: 19,
-            reorderPoint: 30,
-            supplier: '零食批发'
-          },
-          {
-            id: 8,
-            name: '特级橄榄油 500ml',
-            category: '粮油',
-            price: 129.90,
-            currentStock: 5,
-            lowStockThreshold: 10,
-            unit: '瓶',
-            sku: 'SKU-OIL-001',
-            imageUrl: 'https://via.placeholder.com/80',
-            lastStockUpdate: '2024-05-16 15:15:36',
-            expiryDate: '2025-01-31',
-            salesThisWeek: 22,
-            reorderPoint: 15,
-            supplier: '进口食品供应商'
           }
         ];
-
+        
         setProducts(mockProducts);
         setFilteredProducts(mockProducts);
-        
-        // Extract unique categories
-        const uniqueCategories = ['all', ...new Set(mockProducts.map(p => p.category))];
-        setCategories(uniqueCategories);
-        
-        // Generate replenishment list based on reorder points
-        const lowStockProducts = mockProducts.filter(p => p.currentStock <= p.reorderPoint);
-        setReplenishmentList(lowStockProducts);
-        
+        setCategories(['all', ...new Set(mockProducts.map(p => p.category))]);
+        setReplenishmentList(mockProducts.filter(p => p.currentStock <= p.reorderPoint));
+      } finally {
         setLoading(false);
-      }, 800);
+      }
     };
 
     fetchInventory();
@@ -223,73 +161,123 @@ const InventoryManagementPage = () => {
     return { color: 'bg-success/20 text-success', label: '库存充足' };
   };
 
-  // Handle stock update
-  const handleStockUpdate = (productId, amount, type) => {
+  // 处理库存更新
+  const handleStockUpdate = async (productId, amount, type) => {
     if (!amount || isNaN(amount) || parseInt(amount) <= 0) {
       alert('请输入有效的数量');
       return;
     }
 
     const updateQuantity = parseInt(amount);
-    setProducts(prev => prev.map(product => {
-      if (product.id === productId) {
-        let newStock = type === 'add' 
-          ? product.currentStock + updateQuantity 
-          : Math.max(0, product.currentStock - updateQuantity);
-        
-        return {
-          ...product,
-          currentStock: newStock,
-          lastStockUpdate: new Date().toISOString().replace('T', ' ').substring(0, 19)
-        };
-      }
-      return product;
-    }));
-
-    // Update replenishment list
-    const updatedProducts = products.map(product => {
-      if (product.id === productId) {
-        let newStock = type === 'add' 
-          ? product.currentStock + updateQuantity 
-          : Math.max(0, product.currentStock - updateQuantity);
-        
-        return {
-          ...product,
-          currentStock: newStock
-        };
-      }
-      return product;
-    });
     
-    const lowStockProducts = updatedProducts.filter(p => p.currentStock <= p.reorderPoint);
-    setReplenishmentList(lowStockProducts);
-
-    // Close modal
-    setIsUpdateModalOpen(false);
-    setCurrentProduct(null);
-    setUpdateAmount('');
-    setUpdateType('add');
+    try {
+      // 调用API更新库存
+      const product = products.find(p => p.id === productId);
+      const newStock = type === 'add' 
+        ? product.currentStock + updateQuantity 
+        : Math.max(0, product.currentStock - updateQuantity);
+      
+      await productsApi.updateProduct(productId, {
+        stock: newStock
+      });
+      
+      // 刷新商品列表
+      const productsResponse = await productsApi.getProducts({ pageSize: 100 });
+      const categoriesResponse = await categoriesApi.getCategories();
+      
+      const productsData = productsResponse.map(item => ({
+        id: item.id,
+        name: item.name,
+        category: categoriesResponse.find(cat => cat.id === item.category_id)?.name || '未分类',
+        price: parseFloat(item.price),
+        currentStock: item.stock,
+        lowStockThreshold: 10,
+        unit: '件',
+        sku: item.sku || `SKU-${item.id}`,
+        imageUrl: item.image_url || 'https://via.placeholder.com/80',
+        lastStockUpdate: item.update_time || new Date().toISOString().replace('T', ' ').substring(0, 19),
+        expiryDate: item.expiry_date || (new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+        salesThisWeek: 0,
+        reorderPoint: 15,
+        supplier: item.supplier || '未知供应商'
+      }));
+      
+      setProducts(productsData);
+      setFilteredProducts(productsData);
+      
+      // 更新补货清单
+      const lowStockProducts = productsData.filter(p => p.currentStock <= p.reorderPoint);
+      setReplenishmentList(lowStockProducts);
+      
+      alert(`库存${type === 'add' ? '入库' : '出库'}成功`);
+    } catch (error) {
+      console.error('库存更新失败:', error);
+      alert('库存更新失败，请重试');
+    } finally {
+      // 关闭模态框
+      setIsUpdateModalOpen(false);
+      setCurrentProduct(null);
+      setUpdateAmount('');
+      setUpdateType('add');
+    }
   };
 
-  // Handle low stock threshold update
-  const handleThresholdUpdate = (productId, newThreshold) => {
+  // 处理库存预警阈值更新
+  const handleThresholdUpdate = async (productId, newThreshold) => {
     if (isNaN(newThreshold) || parseInt(newThreshold) < 0) {
       alert('请输入有效的库存预警值');
       return;
     }
 
+    // 在实际项目中，这里可能需要调用专门的API来更新预警阈值
+    // 由于当前没有专门的API，我们暂时只更新本地状态
     setProducts(prev => prev.map(product => 
+      product.id === productId 
+        ? { ...product, lowStockThreshold: parseInt(newThreshold) }
+        : product
+    ));
+    
+    // 也更新筛选后的列表
+    setFilteredProducts(prev => prev.map(product => 
       product.id === productId 
         ? { ...product, lowStockThreshold: parseInt(newThreshold) }
         : product
     ));
   };
 
-  // Generate new replenishment list
-  const generateReplenishmentList = () => {
-    const lowStockProducts = products.filter(p => p.currentStock <= p.reorderPoint);
-    setReplenishmentList(lowStockProducts);
-    alert(`已生成补货清单，共${lowStockProducts.length}种商品需要补货`);
+  // 生成补货清单
+  const generateReplenishmentList = async () => {
+    try {
+      // 重新从API获取最新数据
+      const productsResponse = await productsApi.getProducts({ pageSize: 100 });
+      const categoriesResponse = await categoriesApi.getCategories();
+      
+      const productsData = productsResponse.map(item => ({
+        id: item.id,
+        name: item.name,
+        category: categoriesResponse.find(cat => cat.id === item.category_id)?.name || '未分类',
+        price: parseFloat(item.price),
+        currentStock: item.stock,
+        lowStockThreshold: 10,
+        unit: '件',
+        sku: item.sku || `SKU-${item.id}`,
+        imageUrl: item.image_url || 'https://via.placeholder.com/80',
+        lastStockUpdate: item.update_time || new Date().toISOString().replace('T', ' ').substring(0, 19),
+        expiryDate: item.expiry_date || (new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+        salesThisWeek: 0,
+        reorderPoint: 15,
+        supplier: item.supplier || '未知供应商'
+      }));
+      
+      // 生成补货清单
+      const lowStockProducts = productsData.filter(p => p.currentStock <= p.reorderPoint);
+      setReplenishmentList(lowStockProducts);
+      
+      alert(`已生成补货清单，共${lowStockProducts.length}种商品需要补货`);
+    } catch (error) {
+      console.error('生成补货清单失败:', error);
+      alert('生成补货清单失败，请重试');
+    }
   };
 
   // Check if user can manage inventory

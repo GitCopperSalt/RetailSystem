@@ -4,7 +4,7 @@ import com.retailsys.entity.Orders;
 import java.util.List;
 
 /**
- * (Orders)表服务接�?
+ * (Orders)表服务接�?
  *
  * @author makejava
  * @since 2025-09-23 17:58:59
@@ -22,7 +22,7 @@ public interface OrdersService {
     /**
      * 分页查询
      *
-     * @param orders 筛选条�?
+     * @param orders 筛选条件
      * @return 查询结果
      */
     List<Orders> queryAll(Orders orders);

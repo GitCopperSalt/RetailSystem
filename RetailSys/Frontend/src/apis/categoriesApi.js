@@ -89,7 +89,7 @@ export const categoriesApi = {
   // 删除分类
   deleteCategory: async (id) => {
     try {
-      const response = await api.delete('/categories', { params: { id } });
+      const response = await api.delete(`/categories/${id}`);
       return response.data;
     } catch (error) {
       console.error('删除分类失败:', error);
@@ -97,3 +97,5 @@ export const categoriesApi = {
     }
   },
 };
+
+export default categoriesApi;

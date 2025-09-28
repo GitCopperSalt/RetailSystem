@@ -15,7 +15,7 @@ import jakarta.annotation.Resource;
  * @since 2025-09-23 17:58:59
  */
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("orders")
 public class OrdersController {
     /**
      * 服务对象
@@ -24,9 +24,9 @@ public class OrdersController {
     private OrdersService ordersService;
 
     /**
-     * 查询所有数�?
+     * 查询所有数据
      *
-     * @param orders 筛选条�?
+     * @param orders 筛选条件
      * @return 查询结果
      */
     @GetMapping
@@ -73,8 +73,8 @@ public class OrdersController {
      * @param id 主键
      * @return 删除是否成功
      */
-    @DeleteMapping
-    public ResponseEntity<Boolean> deleteById(Integer id) {
+    @DeleteMapping("{id}")
+    public ResponseEntity<Boolean> deleteById(@PathVariable("id") Integer id) {
         return ResponseEntity.ok(this.ordersService.deleteById(id));
     }
 

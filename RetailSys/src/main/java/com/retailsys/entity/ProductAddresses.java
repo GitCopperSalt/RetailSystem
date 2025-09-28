@@ -4,7 +4,7 @@ import java.util.Date;
 import java.io.Serializable;
 
 /**
- * (ProductAddresses)实体�?
+ * (ProductAddresses)实体类
  *
  * @author makejava
  * @since 2025-09-23 17:59:21
@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class ProductAddresses implements Serializable {
     private static final long serialVersionUID = -90500958785568352L;
 /**
-     * 地址ID，主�?
+     * 地址ID，主键
      */
     private Integer id;
 /**
@@ -20,7 +20,7 @@ public class ProductAddresses implements Serializable {
      */
     private String name;
 /**
-     * 联系人姓�?
+     * 联系人姓名
      */
     private String contactPerson;
 /**
@@ -36,7 +36,7 @@ public class ProductAddresses implements Serializable {
      */
     private String city;
 /**
-     * �?�?
+     * 区县
      */
     private String district;
 /**
@@ -48,7 +48,7 @@ public class ProductAddresses implements Serializable {
      */
     private String zipCode;
 /**
-     * 地址类型（如仓库、发货点�?
+     * 地址类型（如仓库、发货点�?
      */
     private String type;
 /**
@@ -56,7 +56,7 @@ public class ProductAddresses implements Serializable {
      */
     private Integer isDefault;
 /**
-     * 是否激�?
+     * 是否激�?
      */
     private Integer isActive;
 /**

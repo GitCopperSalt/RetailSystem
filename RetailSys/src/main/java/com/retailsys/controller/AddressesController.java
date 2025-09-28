@@ -16,7 +16,7 @@ import java.util.List;
  * @since 2025-09-23 17:56:59
  */
 @RestController
-@RequestMapping("/api/addresses")
+@RequestMapping("addresses")
 public class AddressesController {
     /**
      * 服务对象
@@ -25,9 +25,9 @@ public class AddressesController {
     private AddressesService addressesService;
 
     /**
-     * 查询所有数�?
+     * 查询所有数据
      *
-     * @param addresses 筛选条�?
+     * @param addresses 筛选条件
      * @return 查询结果
      */
     @GetMapping
@@ -74,8 +74,8 @@ public class AddressesController {
      * @param id 主键
      * @return 删除是否成功
      */
-    @DeleteMapping
-    public ResponseEntity<Boolean> deleteById(Integer id) {
+    @DeleteMapping("{id}")
+    public ResponseEntity<Boolean> deleteById(@PathVariable("id") Integer id) {
         return ResponseEntity.ok(this.addressesService.deleteById(id));
     }
 

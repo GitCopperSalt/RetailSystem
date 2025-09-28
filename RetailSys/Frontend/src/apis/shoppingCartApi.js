@@ -89,7 +89,7 @@ export const shoppingCartApi = {
   // 从购物车删除商品
   deleteFromShoppingCart: async (id) => {
     try {
-      const response = await api.delete('/shoppingCart', { params: { id } });
+      const response = await api.delete(`/shoppingCart/${id}`);
       return response.data;
     } catch (error) {
       console.error('从购物车删除商品失败:', error);
@@ -97,3 +97,5 @@ export const shoppingCartApi = {
     }
   },
 };
+
+export default shoppingCartApi;

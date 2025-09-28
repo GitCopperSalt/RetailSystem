@@ -4,7 +4,7 @@ import java.util.Date;
 import java.io.Serializable;
 
 /**
- * (ShoppingCart)实体�?
+ * (ShoppingCart)实体类
  *
  * @author makejava
  * @since 2025-09-23 17:59:55
@@ -12,15 +12,15 @@ import java.io.Serializable;
 public class ShoppingCart implements Serializable {
     private static final long serialVersionUID = 113424786274099971L;
 /**
-     * 购物车ID，主�?
+     * 购物车ID，主键
      */
     private Integer id;
 /**
-     * 用户ID，关联users�?
+     * 用户ID，关联users�?
      */
     private Integer userId;
 /**
-     * 商品ID，关联products�?
+     * 商品ID，关联products�?
      */
     private Integer productId;
 /**

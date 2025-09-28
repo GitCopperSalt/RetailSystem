@@ -4,7 +4,7 @@ import java.util.Date;
 import java.io.Serializable;
 
 /**
- * (Roles)实体�?
+ * (Roles)实体类
  *
  * @author makejava
  * @since 2025-09-23 17:59:47
@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class Roles implements Serializable {
     private static final long serialVersionUID = -31126401525238367L;
 /**
-     * 角色ID，主�?
+     * 角色ID，主键
      */
     private Integer id;
 /**

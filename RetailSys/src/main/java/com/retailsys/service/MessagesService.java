@@ -4,7 +4,7 @@ import com.retailsys.entity.Messages;
 import java.util.List;
 
 /**
- * (Messages)表服务接�?
+ * (Messages)表服务接�?
  *
  * @author makejava
  * @since 2025-09-23 17:57:45
@@ -22,7 +22,7 @@ public interface MessagesService {
     /**
      * 分页查询
      *
-     * @param messages 筛选条�?
+     * @param messages 筛选条件
      * @return 查询结果
      */
     List<Messages> queryAll(Messages messages);

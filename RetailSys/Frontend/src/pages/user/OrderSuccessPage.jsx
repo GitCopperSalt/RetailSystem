@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { orderApi } from '../../services/apiService';
+import orderApi from '../../apis/orderApi';
 
 const OrderSuccessPage = () => {
   const { orderId } = useParams();

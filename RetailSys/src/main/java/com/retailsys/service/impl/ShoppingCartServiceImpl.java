@@ -34,7 +34,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     /**
      * 分页查询
      *
-     * @param shoppingCart 筛选条�?
+     * @param shoppingCart 筛选条件
      * @return 查询结果
      */
     @Override

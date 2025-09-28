@@ -89,7 +89,7 @@ export const productsApi = {
   // 删除商品
   deleteProduct: async (id) => {
     try {
-      const response = await api.delete('/products', { params: { id } });
+      const response = await api.delete(`/products/${id}`);
       return response.data;
     } catch (error) {
       console.error('删除商品失败:', error);
@@ -97,3 +97,5 @@ export const productsApi = {
     }
   },
 };
+
+export default productsApi;

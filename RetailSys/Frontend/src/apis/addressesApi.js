@@ -89,7 +89,7 @@ export const addressesApi = {
   // 删除地址
   deleteAddress: async (id) => {
     try {
-      const response = await api.delete('/addresses', { params: { id } });
+      const response = await api.delete(`/addresses/${id}`);
       return response.data;
     } catch (error) {
       console.error('删除地址失败:', error);
@@ -97,3 +97,5 @@ export const addressesApi = {
     }
   },
 };
+
+export default addressesApi;

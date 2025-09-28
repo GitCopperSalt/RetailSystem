@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { productApi } from '../../services/apiService';
+import productsApi from '../../apis/productsApi';
 
 const ProductCatalogPage = () => {
   const { currentUser, isAuthenticated } = useAuth();
@@ -30,7 +30,7 @@ const ProductCatalogPage = () => {
       setLoading(true);
       try {
         // 调用API获取商品列表
-        const productsData = await productApi.getProducts(0, 100); // 新API直接返回数据
+        const productsData = await productsApi.getProducts(0, 100); // 新API直接返回数据
         
         // 转换后端数据格式以匹配前端预期的结构
         const transformedProducts = productsData.map(item => ({

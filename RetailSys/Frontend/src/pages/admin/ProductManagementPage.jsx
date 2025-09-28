@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { productApi, categoryApi } from '../../services/apiService';
+import productsApi from '../../apis/productsApi';
+import categoriesApi from '../../apis/categoriesApi';
 
 const ProductManagementPage = () => {
   const { hasPermission } = useAuth();
@@ -32,8 +33,8 @@ const ProductManagementPage = () => {
         
         // 并行获取商品和分类数据
         const [productsResponse, categoriesResponse] = await Promise.all([
-          productApi.getProducts(0, 100), // 获取所有商品，限制为100条
-          categoryApi.getCategories()      // 获取所有分类
+          productsApi.getProducts({ pageSize: 100 }), // 获取所有商品，限制为100条
+          categoriesApi.getCategories()      // 获取所有分类
         ]);
         
         // 转换后端商品数据格式以匹配前端预期的结构
@@ -138,11 +139,11 @@ const ProductManagementPage = () => {
       };
       
       // 调用API添加商品
-      const response = await productApi.createProduct(productData);
+      const response = await productsApi.createProduct(productData);
       
       // 刷新商品列表
-      const productsResponse = await productApi.getProducts(0, 100);
-      const productsData = productsResponse.items.map(item => ({
+      const productsResponse = await productsApi.getProducts({ pageSize: 100 });
+      const productsData = productsResponse.map(item => ({
         id: item.id,
         name: item.name,
         price: parseFloat(item.price),
@@ -204,6 +205,7 @@ const ProductManagementPage = () => {
     try {
       // 准备提交给后端的数据格式
       const productData = {
+        id: currentProduct.id,
         name: currentProduct.name,
         price: currentProduct.price,
         stock: currentProduct.inventory,
@@ -212,11 +214,11 @@ const ProductManagementPage = () => {
       };
       
       // 调用API更新商品
-      const response = await productApi.updateProduct(currentProduct.id, productData);
+      const response = await productsApi.updateProduct(productData);
       
       // 刷新商品列表
-      const productsResponse = await productApi.getProducts(0, 100);
-      const productsData = productsResponse.items.map(item => ({
+      const productsResponse = await productsApi.getProducts({ pageSize: 100 });
+      const productsData = productsResponse.map(item => ({
         id: item.id,
         name: item.name,
         price: parseFloat(item.price),
@@ -246,11 +248,11 @@ const ProductManagementPage = () => {
       setLoading(true);
       try {
         // 调用API删除商品
-        await productApi.deleteProduct(productId);
-        
-        // 刷新商品列表
-      const productsResponse = await productApi.getProducts(0, 100);
-      const productsData = productsResponse.items.map(item => ({
+      await productsApi.deleteProduct(productId);
+      
+      // 刷新商品列表
+      const productsResponse = await productsApi.getProducts({ pageSize: 100 });
+      const productsData = productsResponse.map(item => ({
         id: item.id,
         name: item.name,
         price: parseFloat(item.price),

@@ -34,14 +34,14 @@ public class UsersServiceImpl implements UsersService {
     /**
      * 分页查询
      *
-     * @param users 筛选条�?
+     * @param users 筛选条件
      * @param page      分页对象
      * @return 查询结果
      */
     public Page<Users> queryByPage(Users users, Page<Users> page) {
         // 使用MyBatis-Plus的QueryWrapper构建查询条件
         QueryWrapper<Users> queryWrapper = new QueryWrapper<>();
-        // 根据实体类的非空属性构建查询条�?
+        // 根据实体类的非空属性构建查询条件
         if (users.getUsername() != null) {
             queryWrapper.like("username", users.getUsername());
         }
@@ -66,9 +66,9 @@ public class UsersServiceImpl implements UsersService {
     }
 
     /**
-     * 查询所有数�?
+     * 查询所有数据
      *
-     * @param users 筛选条�?
+     * @param users 筛选条件
      * @return 查询结果
      */
     @Override

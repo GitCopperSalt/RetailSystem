@@ -89,7 +89,7 @@ export const permissionsApi = {
   // 删除权限
   deletePermission: async (id) => {
     try {
-      const response = await api.delete('/permissions', { params: { id } });
+      const response = await api.delete(`/permissions/${id}`);
       return response.data;
     } catch (error) {
       console.error('删除权限失败:', error);

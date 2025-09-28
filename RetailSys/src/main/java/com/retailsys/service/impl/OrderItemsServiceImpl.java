@@ -34,7 +34,7 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     /**
      * 分页查询
      *
-     * @param orderItems 筛选条�?
+     * @param orderItems 筛选条件
      * @return 查询结果
      */
     @Override

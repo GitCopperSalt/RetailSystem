@@ -89,7 +89,7 @@ export const orderItemsApi = {
   // 删除订单项
   deleteOrderItem: async (id) => {
     try {
-      const response = await api.delete('/orderItems', { params: { id } });
+      const response = await api.delete(`/orderItems/${id}`);
       return response.data;
     } catch (error) {
       console.error('删除订单项失败:', error);

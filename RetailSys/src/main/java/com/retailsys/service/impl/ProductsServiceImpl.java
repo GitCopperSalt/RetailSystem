@@ -32,7 +32,7 @@ public class ProductsServiceImpl implements ProductsService {
     /**
      * 分页查询
      *
-     * @param products 筛选条�?
+     * @param products 筛选条件
      * @return 查询结果
      */
     @Override

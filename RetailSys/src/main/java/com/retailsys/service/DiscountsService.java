@@ -4,7 +4,7 @@ import com.retailsys.entity.Discounts;
 import java.util.List;
 
 /**
- * (Discounts)表服务接�?
+ * (Discounts)表服务接�?
  *
  * @author makejava
  * @since 2025-09-23 17:57:33
@@ -22,7 +22,7 @@ public interface DiscountsService {
     /**
      * 分页查询
      *
-     * @param discounts 筛选条�?
+     * @param discounts 筛选条件
      * @return 查询结果
      */
     List<Discounts> queryAll(Discounts discounts);

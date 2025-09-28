@@ -34,7 +34,7 @@ public class CategoriesServiceImpl implements CategoriesService {
     /**
      * 分页查询
      *
-     * @param categories 筛选条�?
+     * @param categories 筛选条件
      * @return 查询结果
      */
     @Override

@@ -4,7 +4,7 @@ import com.retailsys.entity.Roles;
 import java.util.List;
 
 /**
- * (Roles)表服务接�?
+ * (Roles)表服务接�?
  *
  * @author makejava
  * @since 2025-09-23 17:59:47
@@ -22,7 +22,7 @@ public interface RolesService {
     /**
      * 分页查询
      *
-     * @param roles 筛选条�?
+     * @param roles 筛选条件
      * @return 查询结果
      */
     List<Roles> queryAll(Roles roles);

@@ -35,12 +35,12 @@ public class AddressesServiceImpl implements AddressesService {
     /**
      * 分页查询
      *
-     * @param addresses 筛选条�?
+     * @param addresses 筛选条件
      * @return 查询结果
      */
     @Override
     public List<Addresses> queryAll(Addresses addresses) {
-        // 提供默认分页参数，查询所有数�?
+        // 提供默认分页参数，查询所有数据
         Page<Addresses> page = new Page<>(1, Integer.MAX_VALUE);
         return addressesDao.queryAllByLimit(addresses, page);
     }

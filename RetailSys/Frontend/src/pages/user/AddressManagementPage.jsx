@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { addressApi } from '../../services/apiService';
+import addressApi from '../../apis/addressApi';
 
 const AddressManagementPage = () => {
   const navigate = useNavigate();

@@ -1,18 +1,10 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authApi, rolesApi, rolePermissionsApi } from '../services/apiService';
+import { authApi, rolesApi, rolePermissionsApi } from '../apis';
 
 // Create auth context
 const AuthContext = createContext();
-
-// Custom hook to use auth context
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -187,29 +179,41 @@ export const AuthProvider = ({ children }) => {
   const fetchAndUpdateSystemRolePermissions = async () => {
     try {
       // 首先获取所有角色
-      const roles = await rolesApi.getRoles();
+      const rolesResponse = await rolesApi.getRoles();
       // 然后获取所有角色权限关联
-      const rolePermissions = await rolePermissionsApi.getRolePermissions();
+      const rolePermissionsResponse = await rolePermissionsApi.getRolePermissions();
+      
+      // 确保处理正确的数据格式
+      const roles = rolesResponse?.data || rolesResponse || [];
+      const rolePermissions = rolePermissionsResponse?.data || rolePermissionsResponse || [];
       
       // 构建角色权限映射
       const rolePermissionMap = {};
       
       // 初始化每个角色的权限数组
-      roles.forEach(role => {
-        rolePermissionMap[role.name] = [];
-      });
+      if (Array.isArray(roles)) {
+        roles.forEach(role => {
+          rolePermissionMap[role.name] = [];
+        });
+      } else {
+        console.warn('Roles data is not an array, using empty array instead');
+      }
       
       // 根据角色权限关联添加权限
-      rolePermissions.forEach(rolePermission => {
-        // 假设rolePermission对象包含roleName和permissionName字段
-        // 如果后端返回的字段名不同，需要根据实际情况调整
-        const roleName = rolePermission.roleName || rolePermission.role?.name;
-        const permissionName = rolePermission.permissionName || rolePermission.permission?.name;
-        
-        if (roleName && permissionName && rolePermissionMap[roleName]) {
-          rolePermissionMap[roleName].push(permissionName);
-        }
-      });
+      if (Array.isArray(rolePermissions)) {
+        rolePermissions.forEach(rolePermission => {
+          // 假设rolePermission对象包含roleName和permissionName字段
+          // 如果后端返回的字段名不同，需要根据实际情况调整
+          const roleName = rolePermission.roleName || rolePermission.role?.name;
+          const permissionName = rolePermission.permissionName || rolePermission.permission?.name;
+          
+          if (roleName && permissionName && rolePermissionMap[roleName]) {
+            rolePermissionMap[roleName].push(permissionName);
+          }
+        });
+      } else {
+        console.warn('Role permissions data is not an array, using empty array instead');
+      }
       
       // 保存到localStorage
       localStorage.setItem('systemRolePermissions', JSON.stringify(rolePermissionMap));
@@ -261,4 +265,13 @@ export const AuthProvider = ({ children }) => {
       {!loading && children}
     </AuthContext.Provider>
   );
+};
+
+// Custom hook to use auth context
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };

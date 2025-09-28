@@ -4,7 +4,7 @@ import com.retailsys.entity.Categories;
 import java.util.List;
 
 /**
- * (Categories)表服务接�?
+ * (Categories)表服务接�?
  *
  * @author makejava
  * @since 2025-09-23 17:57:19
@@ -22,7 +22,7 @@ public interface CategoriesService {
     /**
      * 分页查询
      *
-     * @param categories 筛选条�?
+     * @param categories 筛选条件
      * @return 查询结果
      */
     List<Categories> queryAll(Categories categories);

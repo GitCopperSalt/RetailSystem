@@ -5,7 +5,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
- * (Orders)表数据库访问�?
+ * (Orders)表数据库访问层
  *
  * @author makejava
  * @since 2025-09-23 17:58:59
@@ -21,7 +21,7 @@ public interface OrdersDao {
     Orders queryById(Integer id);
 
     /**
-     * 查询指定行数�?
+     * 查询指定行数
      *
      * @param orders 查询条件
      * @return 对象列表
@@ -29,10 +29,10 @@ public interface OrdersDao {
     List<Orders> queryAll(Orders orders);
 
     /**
-     * 统计总行�?
+     * 统计总行数
      *
      * @param orders 查询条件
-     * @return 总行�?
+     * @return 总行数
      */
     long count(Orders orders);
 
@@ -45,7 +45,7 @@ public interface OrdersDao {
     int insert(Orders orders);
 
     /**
-     * 批量新增数据（MyBatis原生foreach方法�?
+     * 批量新增数据（MyBatis原生foreach方法）
      *
      * @param entities List<Orders> 实例对象列表
      * @return 影响行数
@@ -53,11 +53,11 @@ public interface OrdersDao {
     int insertBatch(@Param("entities") List<Orders> entities);
 
     /**
-     * 批量新增或按主键更新数据（MyBatis原生foreach方法�?
+     * 批量新增或按主键更新数据（MyBatis原生foreach方法）
      *
      * @param entities List<Orders> 实例对象列表
      * @return 影响行数
-     * @throws org.springframework.jdbc.BadSqlGrammarException 入参是空List的时候会抛SQL语句错误的异常，请自行校验入�?
+     * @throws org.springframework.jdbc.BadSqlGrammarException 入参是空List的时候会抛SQL语句错误的异常，请自行校验入参
      */
     int insertOrUpdateBatch(@Param("entities") List<Orders> entities);
 

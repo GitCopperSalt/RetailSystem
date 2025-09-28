@@ -89,7 +89,7 @@ export const productAddressesApi = {
   // 删除商品地址
   deleteProductAddress: async (id) => {
     try {
-      const response = await api.delete('/productAddresses', { params: { id } });
+      const response = await api.delete(`/productAddresses/${id}`);
       return response.data;
     } catch (error) {
       console.error('删除商品地址失败:', error);

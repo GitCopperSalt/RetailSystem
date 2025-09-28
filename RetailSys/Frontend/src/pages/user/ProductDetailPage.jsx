@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { productApi, shoppingCartApi } from '../../services/apiService';
+import productsApi from '../../apis/productsApi';
+import shoppingCartApi from '../../apis/shoppingCartApi';
 import { useAuth } from '../../context/AuthContext';
 
 const ProductDetailPage = () => {
@@ -25,7 +26,7 @@ const ProductDetailPage = () => {
       setLoading(true);
       try {
         // 调用API获取商品详情
-        const response = await productApi.getProductById(productId);
+        const response = await productsApi.getProductById(productId);
         
         // 转换后端数据格式以匹配前端预期的结构
         const productData = {

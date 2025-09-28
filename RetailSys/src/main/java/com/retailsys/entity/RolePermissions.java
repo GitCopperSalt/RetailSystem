@@ -4,7 +4,7 @@ import java.util.Date;
 import java.io.Serializable;
 
 /**
- * (RolePermissions)实体�?
+ * (RolePermissions)实体类
  *
  * @author makejava
  * @since 2025-09-23 17:59:39
@@ -12,15 +12,15 @@ import java.io.Serializable;
 public class RolePermissions implements Serializable {
     private static final long serialVersionUID = 516092868985585024L;
 /**
-     * 关联ID，主�?
+     * 关联ID，主键
      */
     private Integer id;
 /**
-     * 角色ID，关联roles�?
+     * 角色ID，关联roles�?
      */
     private Integer roleId;
 /**
-     * 权限ID，关联permissions�?
+     * 权限ID，关联permissions�?
      */
     private Integer permissionId;
 /**

@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { messagesApi } from '../../services/apiService';
+import { messagesApi } from '../../apis/messagesApi';
 
 // Configure dayjs
 dayjs.locale('zh-cn');
@@ -36,10 +36,11 @@ const MessageCenterPage = () => {
       try {
         // 使用API获取消息
         const response = await messagesApi.getMessages();
-        const messageData = Array.isArray(response) ? response : (response.items || []);
+        // 处理API响应，假设新的API返回的数据格式已经匹配前端需求
+        const messageData = response.data || [];
         
         // 检查是否有未读消息
-        const hasUnread = messageData.some(msg => !msg.is_read);
+        const hasUnread = messageData.some(msg => !msg.isRead);
         setShowMarkAllRead(hasUnread);
         
         // 转换API返回的数据格式以匹配前端期望的结构
@@ -50,9 +51,9 @@ const MessageCenterPage = () => {
           type: msg.type || 'system',
           category: msg.category || '',
           icon: getMessageTypeIcon(msg.type || 'system').split(' ')[0].replace('fa-', ''),
-          actionLink: msg.action_link || '#',
-          isRead: msg.is_read || false,
-          createdAt: msg.created_at
+          actionLink: msg.actionLink || '#',
+          isRead: msg.isRead || false,
+          createdAt: msg.createdAt || new Date().toISOString()
         }));
         
         setMessages(formattedMessages);
@@ -185,7 +186,7 @@ const MessageCenterPage = () => {
               content = '检测到异常登录尝试，请确认是否为您本人操作。';
               break;
             default:
-              title = '系统通知';
+              title = '系统消息';
               content = '系统消息通知。';
           }
           break;
@@ -270,8 +271,8 @@ const MessageCenterPage = () => {
   // Handle message read
   const handleReadMessage = async (messageId) => {
     try {
-      // 调用API标记消息为已读
-      await messagesApi.updateMessage(messageId, { isRead: true });
+      // 调用API标记消息为已读，根据API实现修改为正确的调用方式
+      await messagesApi.updateMessage({ id: messageId, isRead: true });
       
       const updatedMessages = messages.map(message => 
         message.id === messageId ? { ...message, isRead: true } : message
@@ -298,7 +299,12 @@ const MessageCenterPage = () => {
   const handleMarkAllRead = async () => {
     try {
       // 调用API标记所有消息为已读
-      await messagesApi.markAllAsRead();
+      // 注意：由于API中没有提供markAllAsRead方法，这里使用循环调用updateMessage方法
+      // 实际应用中可能需要后端提供批量操作接口
+      const unreadMessages = messages.filter(msg => !msg.isRead);
+      for (const message of unreadMessages) {
+        await messagesApi.updateMessage({ id: message.id, isRead: true });
+      }
       
       const updatedMessages = messages.map(message => ({ ...message, isRead: true }));
       setMessages(updatedMessages);
@@ -344,7 +350,11 @@ const MessageCenterPage = () => {
   const handleDeleteAllMessages = async () => {
     try {
       // 调用API删除所有消息
-      await messagesApi.deleteAllMessages();
+      // 注意：由于API中没有提供deleteAllMessages方法，这里使用循环调用deleteMessage方法
+      // 实际应用中可能需要后端提供批量操作接口
+      for (const message of messages) {
+        await messagesApi.deleteMessage(message.id);
+      }
       
       setMessages([]);
       localStorage.removeItem('adminMessages');

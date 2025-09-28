@@ -24,9 +24,9 @@ public class RolePermissionsController {
     private RolePermissionsService rolePermissionsService;
 
     /**
-     * 查询所有数�?
+     * 查询所有数据
      *
-     * @param rolePermissions 筛选条�?
+     * @param rolePermissions 筛选条件
      * @return 查询结果
      */
     @GetMapping
@@ -73,8 +73,8 @@ public class RolePermissionsController {
      * @param id 主键
      * @return 删除是否成功
      */
-    @DeleteMapping
-    public ResponseEntity<Boolean> deleteById(Integer id) {
+    @DeleteMapping("{id}")
+    public ResponseEntity<Boolean> deleteById(@PathVariable("id") Integer id) {
         return ResponseEntity.ok(this.rolePermissionsService.deleteById(id));
     }
 

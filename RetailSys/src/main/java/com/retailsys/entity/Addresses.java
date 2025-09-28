@@ -36,7 +36,7 @@ public class Addresses implements Serializable {
      */
     private String city;
 /**
-     * �?�?
+     * 区县
      */
     private String district;
 /**

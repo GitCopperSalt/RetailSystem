@@ -4,7 +4,7 @@ import com.retailsys.entity.Users;
 import java.util.List;
 
 /**
- * (Users)表服务接�?
+ * (Users)表服务接�?
  *
  * @author makejava
  * @since 2025-09-23 18:00:03
@@ -22,7 +22,7 @@ public interface UsersService {
     /**
      * 分页查询
      *
-     * @param users 筛选条�?
+     * @param users 筛选条件
      * @return 查询结果
      */
     List<Users> queryAll(Users users);

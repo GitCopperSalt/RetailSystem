@@ -89,11 +89,11 @@ export const rolePermissionsApi = {
   // 删除角色权限
   deleteRolePermission: async (id) => {
     try {
-      const response = await api.delete('/rolePermissions', { params: { id } });
+      const response = await api.delete(`/rolePermissions/${id}`);
       return response.data;
     } catch (error) {
       console.error('删除角色权限失败:', error);
       throw error;
     }
-  },
+  }
 };

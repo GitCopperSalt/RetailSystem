@@ -5,7 +5,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
- * (ShoppingCart)表数据库访问�?
+ * (ShoppingCart)表数据库访问层
  *
  * @author makejava
  * @since 2025-09-23 17:59:55
@@ -21,7 +21,7 @@ public interface ShoppingCartDao {
     ShoppingCart queryById(Integer id);
 
     /**
-     * 查询指定行数�?
+     * 查询指定行数
      *
      * @param shoppingCart 查询条件
      * @return 对象列表
@@ -29,10 +29,10 @@ public interface ShoppingCartDao {
     List<ShoppingCart> queryAll(ShoppingCart shoppingCart);
 
     /**
-     * 统计总行�?
+     * 统计总行数
      *
      * @param shoppingCart 查询条件
-     * @return 总行�?
+     * @return 总行数
      */
     long count(ShoppingCart shoppingCart);
 
@@ -45,7 +45,7 @@ public interface ShoppingCartDao {
     int insert(ShoppingCart shoppingCart);
 
     /**
-     * 批量新增数据（MyBatis原生foreach方法�?
+     * 批量新增数据（MyBatis原生foreach方法）
      *
      * @param entities List<ShoppingCart> 实例对象列表
      * @return 影响行数

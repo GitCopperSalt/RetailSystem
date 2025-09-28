@@ -32,7 +32,7 @@ public class JwtUtils {
     }
 
     /**
-     * 从JWT令牌中提取过期时�?     */
+     * 从JWT令牌中提取过期时间     */
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
@@ -46,7 +46,7 @@ public class JwtUtils {
     }
 
     /**
-     * 从JWT令牌中提取所有声�?     */
+     * 从JWT令牌中提取所有声明     */
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder().setSigningKey(io.jsonwebtoken.security.Keys.hmacShaKeyFor(jwtSecret.getBytes())).build().parseClaimsJws(token).getBody();
     }

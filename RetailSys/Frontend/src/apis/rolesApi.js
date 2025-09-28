@@ -64,6 +64,17 @@ export const rolesApi = {
     }
   },
 
+  // 根据角色名称获取角色
+  getRoleByName: async (roleName) => {
+    try {
+      const response = await api.get('/roles/name', { params: { roleName } });
+      return response.data;
+    } catch (error) {
+      console.error(`获取角色名称为${roleName}的角色失败:`, error);
+      throw error;
+    }
+  },
+
   // 创建新角色
   createRole: async (roleData) => {
     try {
@@ -89,11 +100,11 @@ export const rolesApi = {
   // 删除角色
   deleteRole: async (id) => {
     try {
-      const response = await api.delete('/roles', { params: { id } });
+      const response = await api.delete(`/roles/${id}`);
       return response.data;
     } catch (error) {
       console.error('删除角色失败:', error);
       throw error;
     }
-  },
+  }
 };

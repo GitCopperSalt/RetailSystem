@@ -4,7 +4,7 @@ import java.util.Date;
 import java.io.Serializable;
 
 /**
- * (Permissions)实体�?
+ * (Permissions)实体类
  *
  * @author makejava
  * @since 2025-09-23 17:59:12
@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class Permissions implements Serializable {
     private static final long serialVersionUID = -31384093310599978L;
 /**
-     * 权限ID，主�?
+     * 权限ID，主键
      */
     private Integer id;
 /**

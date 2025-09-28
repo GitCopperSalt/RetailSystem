@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // 创建axios实例，设置基础URL
 const api = axios.create({
-  baseURL: '/api', // 基础API路径
+  baseURL: '', // 基础API路径
   timeout: 10000, // 请求超时时间
   headers: {
     'Content-Type': 'application/json',
@@ -57,10 +57,49 @@ export const authApi = {
   register: async (registerData) => {
     try {
       const response = await api.post('/auth/register', registerData);
+      // 后端现在会默认分配customer角色，直接返回响应
       return response.data;
     } catch (error) {
       console.error('注册失败:', error);
       throw error;
     }
   },
+
+  // 获取当前用户信息（包含角色）
+  getCurrentUser: async () => {
+    try {
+      const response = await api.get('/auth/me');
+      return response.data;
+    } catch (error) {
+      console.error('获取用户信息失败:', error);
+      throw error;
+    }
+  },
+
+  // 登出
+  logout: async () => {
+    try {
+      const response = await api.post('/auth/logout');
+      // 清除localStorage中的token
+      localStorage.removeItem('authToken');
+      return response.data;
+    } catch (error) {
+      console.error('登出失败:', error);
+      // 即使API调用失败，也要清除token
+      localStorage.removeItem('authToken');
+      throw error;
+    }
+  },
+
+  // 微信登录
+  wechatLogin: async (openid) => {
+    try {
+      const response = await api.post('/auth/wechat-login', { openid });
+      // 后端会返回包含用户信息和角色的响应
+      return response.data;
+    } catch (error) {
+      console.error('微信登录失败:', error);
+      throw error;
+    }
+  }
 };

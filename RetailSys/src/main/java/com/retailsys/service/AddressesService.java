@@ -4,7 +4,7 @@ import com.retailsys.entity.Addresses;
 import java.util.List;
 
 /**
- * (Addresses)表服务接�?
+ * (Addresses)表服务接�?
  *
  * @author makejava
  * @since 2025-09-23 17:57:03
@@ -22,7 +22,7 @@ public interface AddressesService {
     /**
      * 分页查询
      *
-     * @param addresses 筛选条�?
+     * @param addresses 筛选条件
      * @return 查询结果
      */
     List<Addresses> queryAll(Addresses addresses);

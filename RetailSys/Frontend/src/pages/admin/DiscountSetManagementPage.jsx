@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { discountApi, productApi, categoryApi } from '../../services/apiService';
+import { discountsApi } from '../../apis/discountsApi';
+import { productsApi } from '../../apis/productsApi';
+import { categoriesApi } from '../../apis/categoriesApi';
 
 const DiscountSetManagementPage = () => {
   const navigate = useNavigate();
@@ -43,9 +45,9 @@ const DiscountSetManagementPage = () => {
       try {
         setLoading(true);
         const [discountSetsData, productsData, categoriesData] = await Promise.all([
-          discountApi.getDiscountSets(),
-          productApi.getProducts(),
-          categoryApi.getCategories(),
+          discountsApi.getDiscounts(),
+          productsApi.getProducts(),
+          categoriesApi.getCategories(),
         ]);
         setDiscountSets(discountSetsData || []);
         setProducts(productsData || []);
@@ -74,9 +76,9 @@ const DiscountSetManagementPage = () => {
   const handleAddSet = async (e) => {
     e.preventDefault();
     try {
-      await discountApi.createDiscountSet(setFormData);
+      await discountsApi.createDiscount(setFormData);
       // 重新加载数据
-      const discountSetsData = await discountApi.getDiscountSets();
+      const discountSetsData = await discountsApi.getDiscounts();
       setDiscountSets(discountSetsData || []);
       setShowAddSetModal(false);
       // 重置表单
@@ -102,9 +104,14 @@ const DiscountSetManagementPage = () => {
     e.preventDefault();
     try {
       if (editingSet) {
-        await discountApi.updateDiscountSet(editingSet.id, setFormData);
+        // 将ID添加到formData中，因为updateDiscount方法期望整个discountData对象
+        const discountDataWithId = {
+          id: editingSet.id,
+          ...setFormData
+        };
+        await discountsApi.updateDiscount(discountDataWithId);
         // 重新加载数据
-        const discountSetsData = await discountApi.getDiscountSets();
+        const discountSetsData = await discountsApi.getDiscounts();
         setDiscountSets(discountSetsData || []);
         setEditingSet(null);
         // 重置表单
@@ -130,9 +137,9 @@ const DiscountSetManagementPage = () => {
   const handleDeleteSet = async () => {
     try {
       if (showDeleteConfirm) {
-        await discountApi.deleteDiscountSet(showDeleteConfirm);
+        await discountsApi.deleteDiscount(showDeleteConfirm);
         // 重新加载数据
-        const discountSetsData = await discountApi.getDiscountSets();
+        const discountSetsData = await discountsApi.getDiscounts();
         setDiscountSets(discountSetsData || []);
         setShowDeleteConfirm(null);
       }

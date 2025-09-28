@@ -4,7 +4,7 @@ import com.retailsys.entity.ShoppingCart;
 import java.util.List;
 
 /**
- * (ShoppingCart)表服务接�?
+ * (ShoppingCart)表服务接�?
  *
  * @author makejava
  * @since 2025-09-23 17:59:55
@@ -22,7 +22,7 @@ public interface ShoppingCartService {
     /**
      * 分页查询
      *
-     * @param shoppingCart 筛选条�?
+     * @param shoppingCart 筛选条件
      * @return 查询结果
      */
     List<ShoppingCart> queryAll(ShoppingCart shoppingCart);

@@ -32,7 +32,7 @@ public class RolePermissionsServiceImpl implements RolePermissionsService {
     /**
      * 分页查询
      *
-     * @param rolePermissions 筛选条�?
+     * @param rolePermissions 筛选条件
      * @return 查询结果
      */
     @Override

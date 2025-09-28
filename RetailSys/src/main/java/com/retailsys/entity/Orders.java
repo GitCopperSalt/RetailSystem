@@ -4,7 +4,7 @@ import java.util.Date;
 import java.io.Serializable;
 
 /**
- * (Orders)实体�?
+ * (Orders)实体类
  *
  * @author makejava
  * @since 2025-09-23 17:58:59
@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class Orders implements Serializable {
     private static final long serialVersionUID = -89051790491649604L;
 /**
-     * 订单ID，主�?
+     * 订单ID，主键
      */
     private Integer id;
 /**
@@ -20,15 +20,15 @@ public class Orders implements Serializable {
      */
     private String orderNo;
 /**
-     * 用户ID，关联users�?
+     * 用户ID，关联users表
      */
     private Integer userId;
 /**
-     * 订单总金�?
+     * 订单总金额
      */
     private Double totalAmount;
 /**
-     * 订单状�?
+     * 订单状态
      */
     private String status;
 /**
@@ -40,7 +40,7 @@ public class Orders implements Serializable {
      */
     private Date paymentTime;
 /**
-     * 收货地址ID，关联addresses�?
+     * 收货地址ID，关联addresses表
      */
     private Integer shippingAddressId;
 /**
@@ -48,7 +48,7 @@ public class Orders implements Serializable {
      */
     private String contactPhone;
 /**
-     * 联系人姓�?
+     * 联系人姓�?
      */
     private String contactName;
 /**

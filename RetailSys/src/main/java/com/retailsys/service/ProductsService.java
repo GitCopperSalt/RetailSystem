@@ -4,7 +4,7 @@ import com.retailsys.entity.Products;
 import java.util.List;
 
 /**
- * (Products)表服务接�?
+ * (Products)表服务接�?
  *
  * @author makejava
  * @since 2025-09-23 17:59:29
@@ -22,7 +22,7 @@ public interface ProductsService {
     /**
      * 分页查询
      *
-     * @param products 筛选条�?
+     * @param products 筛选条件
      * @return 查询结果
      */
     List<Products> queryAll(Products products);

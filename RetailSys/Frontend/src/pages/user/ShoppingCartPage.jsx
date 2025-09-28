@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { shoppingCartApi } from '../../services/apiService';
+import shoppingCartApi from '../../apis/shoppingCartApi';
 
 const ShoppingCartPage = () => {
   const navigate = useNavigate();

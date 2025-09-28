@@ -16,7 +16,7 @@ import java.io.Serializable;
 public class Users implements Serializable {
     private static final long serialVersionUID = 964836888949602161L;
 /**
-     * 用户ID，主�?
+     * 用户ID，主键
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
@@ -25,7 +25,7 @@ public class Users implements Serializable {
      */
     private String username;
 /**
-     * 密码，加密存�?
+     * 密码，加密存储
      */
     private String password;
 /**
@@ -53,7 +53,7 @@ public class Users implements Serializable {
      */
     private Integer roleId;
 /**
-     * 是否激�?
+     * 是否激活
      */
     private Integer isActive;
 /**

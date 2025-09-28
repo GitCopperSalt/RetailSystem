@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { categoryApi } from '../../services/apiService';
+// 自定义message函数替代antd的message
+const message = {
+  success: (text) => console.log('Success:', text),
+  error: (text) => console.error('Error:', text),
+  warning: (text) => console.warn('Warning:', text),
+};
+import categoriesApi from '../../apis/categoriesApi';
 
 const CategoryManagementPage = () => {
   const navigate = useNavigate();
@@ -134,7 +140,7 @@ const CategoryManagementPage = () => {
         };
         
         // 调用API创建分类
-        await categoryApi.createCategory(categoryData);
+        await categoriesApi.createCategory(categoryData);
         
         // 重新获取分类列表
         await fetchCategories();
@@ -153,6 +159,7 @@ const CategoryManagementPage = () => {
       try {
         // 准备API请求数据
         const categoryData = {
+          id: editingCategory.id,
           name: categoryFormData.name,
           description: categoryFormData.description,
           parent_id: categoryFormData.parentId || null,
@@ -161,7 +168,7 @@ const CategoryManagementPage = () => {
         };
         
         // 调用API更新分类
-        await categoryApi.updateCategory(editingCategory.id, categoryData);
+        await categoriesApi.updateCategory(categoryData);
         
         // 重新获取分类列表
         await fetchCategories();
@@ -178,7 +185,7 @@ const CategoryManagementPage = () => {
   const handleDeleteCategory = async (categoryId) => {
     try {
       // 调用API删除分类
-      await categoryApi.deleteCategory(categoryId);
+      await categoriesApi.deleteCategory(categoryId);
       
       // 重新获取分类列表
       await fetchCategories();
@@ -203,14 +210,26 @@ const CategoryManagementPage = () => {
   // Toggle category active status
   const handleToggleCategoryStatus = async (categoryId) => {
     try {
-      // 调用API切换分类状态
-      await categoryApi.toggleCategoryStatus(categoryId);
+      const category = categories.find(c => c.id === categoryId);
+      if (!category) {
+        message.error('分类不存在');
+        return;
+      }
       
-      // 重新获取分类列表
+      // Update category status
+      await categoriesApi.updateCategory({
+        id: categoryId,
+        status: !category.isActive ? 1 : 0
+      });
+      
+      // Refresh category list
       await fetchCategories();
+      
+      // Show success message
+      message.success(`分类已${!category.isActive ? '启用' : '禁用'}`);
     } catch (error) {
-      console.error('切换分类状态失败:', error);
-      alert(error.message || '切换分类状态失败');
+      console.error('更新分类状态失败:', error);
+      message.error('操作失败，请重试。');
     }
   };
 
@@ -218,8 +237,7 @@ const CategoryManagementPage = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await categoryApi.getCategories();
-      const systemCategories = response.data || [];
+      const systemCategories = await categoriesApi.getCategories();
       
       // 确保数据结构正确
       if (!Array.isArray(systemCategories)) {
@@ -313,12 +331,6 @@ const CategoryManagementPage = () => {
     const matchesParent = !selectedParent || category.parentId === selectedParent;
     return matchesSearch && matchesParent;
   });
-
-  // Get category name by ID
-  const getCategoryNameById = (categoryId) => {
-    const category = categories.find(c => c.id === categoryId);
-    return category ? category.name : '无父分类';
-  };
 
   // Render category tree structure
   const renderCategoryTree = (parentId = '', level = 0) => {

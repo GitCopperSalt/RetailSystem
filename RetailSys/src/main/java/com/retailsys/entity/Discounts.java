@@ -4,7 +4,7 @@ import java.util.Date;
 import java.io.Serializable;
 
 /**
- * (Discounts)实体�?
+ * (Discounts)实体类
  *
  * @author makejava
  * @since 2025-09-23 17:57:33
@@ -12,7 +12,7 @@ import java.io.Serializable;
 public class Discounts implements Serializable {
     private static final long serialVersionUID = 583336180763363133L;
 /**
-     * 折扣ID，主�?
+     * 折扣ID，主键
      */
     private Integer id;
 /**
@@ -24,7 +24,7 @@ public class Discounts implements Serializable {
      */
     private String type;
 /**
-     * 折扣�?
+     * 折扣值
      */
     private Double value;
 /**
